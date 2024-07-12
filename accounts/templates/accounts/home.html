@@ -1,3 +1,51 @@
 <h1>Welcome to the Home Page</h1>
 <p>You are logged in.</p>
 <a href="{% url 'logout' %}">Logout</a>
+
+<div id="chat-container" style="margin-top: 20px; border: 1px solid #ccc; padding: 10px;">
+    <div id="chat-messages" style="height: 300px; overflow-y: auto; margin-bottom: 10px; border: 1px solid #eee; padding: 10px;"></div>
+    <form id="chat-form">
+        {% csrf_token %}
+        <input type="text" id="user-input" placeholder="Type your message..." style="width: 80%; padding: 5px;">
+        <button type="submit" style="padding: 5px 10px;">Send</button>
+    </form>
+</div>
+
+<script>
+document.getElementById('chat-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var userInput = document.getElementById('user-input');
+    var message = userInput.value;
+    userInput.value = '';
+    
+    // Display user message
+    addMessage('You: ' + message);
+    
+    // Send message to server
+    fetch('{% url "chat" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        },
+        body: JSON.stringify({message: message}),
+    })
+    .then(response => response.json())
+    .then(data => {
+        addMessage('AI: ' + data.message);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        addMessage('Error: Could not get a response from the AI.');
+    });
+});
+
+function addMessage(message) {
+    var messageDiv = document.createElement('div');
+    messageDiv.textContent = message;
+    document.getElementById('chat-messages').appendChild(messageDiv);
+    // Scroll to the bottom of the chat
+    var chatMessages = document.getElementById('chat-messages');
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+</script>

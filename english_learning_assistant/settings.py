@@ -1,4 +1,9 @@
+import os
+from dotenv import load_dotenv
 from pathlib import Path
+
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -117,4 +122,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOGIN_URL = 'login'  # This tells Django where the login page is
 LOGIN_REDIRECT_URL = 'home'  # This is used by the built-in auth views
+LOGOUT_REDIRECT_URL = 'home'
 
+load_dotenv()
+GROQ_API_KEY = os.environ.get('GROQ_API_KEY')
+if not GROQ_API_KEY:
+    raise ValueError("GROQ_API_KEY is not set in the environment variables")
